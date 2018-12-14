@@ -1,0 +1,6 @@
+plugin: netbox
+api_endpoint: http://192.168.99.20:80
+token: "7a096c1182f928637a6441c23119ecee042439b2"
+validate_certs: True
+group_by:
+  - device_roles

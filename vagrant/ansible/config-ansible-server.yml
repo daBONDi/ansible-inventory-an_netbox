@@ -1,0 +1,195 @@
+---
+
+- hosts: all
+  vars:
+    ansible_branch: stable-2.7
+  tasks:
+
+    - name: "Configure Required Packages"
+      apt:
+        state: latest
+        cache_valid_time: 86400
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - nano
+          - dnsutils
+          - git
+          - sshpass
+          - libkrb5-dev
+          - python-dev
+          - python-pip
+          - software-properties-common
+          - krb5-user
+          - libmysqlclient-dev
+          - libffi-dev
+          - libssl-dev
+          - docker
+
+    - name: "Ensure desired Timezone"
+      timezone:
+        name: Europe/Vienna
+
+    - name: "Configure required Python packages"
+      pip:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          # Required for ipadddr filter in ansible
+          - netaddr
+
+          # Requried for network device configuration
+          - paramiko
+
+          # Required for WinRM Kerberos Auth
+          - pywinrm[kerberos]
+
+          # Required for Ansible VMWare ESX/vSphere Management
+          - pyvmomi
+
+          # Required for MySQL Server Management
+          - mysqlclient
+
+          # Require for Certificate Management(Docker TLS)
+          - pyOpenSSL
+
+          # Require for Docker API Communication
+          - docker-py
+
+          # Require for PSRP(WinRM Plugin)
+          # https://docs.ansible.com/ansible/2.7/plugins/connection/psrp.html
+          - pypsrp
+
+          # Required Netbox plugin for accessing Netbox Service
+          - pynetbox
+    
+    - name: "Install Ansible"
+      pip:
+        name: "git+git://github.com/ansible/ansible.git@{{ ansible_branch }}"
+    
+    # Installing ARA - https://ara.readthedocs.io/en/latest/index.html
+
+    - name: "Installing ARA WebService Package Dependincies"
+      apt:
+        state: latest
+        cache_valid_time: 86400
+        name: "{{ packages }}"
+      vars:
+        packages:  
+          - "apache2"
+          - "libapache2-mod-wsgi"
+
+    - name: "Install ARA"
+      pip:
+        name: ara
+    
+    - name: "Ensure ARA WebRoot Exists"
+      file:
+        path: '/var/www/ara'
+        state: directory
+        mode: 0755
+      
+    - name: "Ensure Webserver is running"
+      systemd:
+        name: apache2
+        state: started
+        enabled: yes
+    
+
+    # - name: Ensure the embedded server service is not started and is disabled
+    #   become: true
+    #   systemd:
+    #     name: ara
+    #     state: stopped
+    #     enabled: no
+    #     masked: yes
+
+    - name: "Deploy ara-wsgi"
+      shell: cp -p $(which ara-wsgi) /var/www/ara/
+      args:
+        creates: /var/www/ara/ara-wsgi
+
+    - name: "Add Vagrant User to www-data group"
+      user:
+        name: vagrant
+        group: www-data
+        append: yes
+    
+    - name: "Deploye Apache Config"
+      copy:
+        dest: /etc/apache2/sites-available/ara.conf
+        content: |
+          <VirtualHost *:80>
+            # Replace ServerName by your hostname
+            ServerName ansible1.josephinum.at
+
+            ErrorLog /var/log/apache2/ara-error.log
+            LogLevel warn
+            CustomLog /var/log/apache2/ara-access.log combined
+
+            WSGIDaemonProcess ara user=www-data group=www-data processes=4 threads=1
+            WSGIScriptAlias / /var/www/ara/ara-wsgi
+
+            SetEnv ANSIBLE_CONFIG /var/www/ara/ansible.cfg
+
+            <Directory /var/www/ara>
+                WSGIProcessGroup ara
+                WSGIApplicationGroup %{GLOBAL}
+                Require all granted
+            </Directory>
+          </VirtualHost>
+    
+    - name: "Ensure ARA Config"
+      copy:
+        content: |
+          [defaults]
+          # This directory is required to store temporary files for Ansible and ARA
+          local_tmp = /var/www/ara/.ansible/tmp
+
+          [ara]
+          # This will default the database and logs location to be inside that directory.
+          dir = /var/www/ara/.ara
+        dest: /var/www/ara/ansible.cfg
+  
+    - name: "Own Files for Apache Process"
+      file: 
+        path: '/var/www/ara'
+        state: directory
+        owner: "www-data"
+        group: "www-data"
+        recurse: true
+
+    - name: "Ensure Website is enabled"
+      become: yes
+      shell: a2ensite ara
+
+    - name: "Restart Apache2"
+      systemd:
+        name: apache2
+        state: restarted
+
+    - name: "Ensure bash_profile file exists"
+      file:
+        path: "/home/vagrant/.bash_profile"
+        state: touch
+
+    - name: "Ensure ansible.cfg from it-infra project on ssh connection"
+      lineinfile:
+        path: "/home/vagrant/.bash_profile"
+        state: present
+        line: 'export ANSIBLE_CONFIG=/opt/it-infra/ansible.cfg'
+        
+    - name: "Ensure we auto-cd into /opt/it-infra"
+      lineinfile:
+        path: "/home/vagrant/.bash_profile"
+        regexp: '^cd /opt/it-infra'
+        state: present
+        line: 'cd /opt/it-infra'
+
+
+
+
+    
+    
+
+

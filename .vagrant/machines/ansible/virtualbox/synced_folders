@@ -1,0 +1,1 @@
+{"virtualbox":{"it-infra":{"id":"it-infra","owner":"vagrant","group":"www-data","mount_options":["dmode=775","fmode=664","uid=1000","gid=33"],"guestpath":"/opt/it-infra","hostpath":"G:/dev/netbox-inventory/ansible","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"G:/dev/netbox-inventory","disabled":false,"__vagrantfile":true}}}
