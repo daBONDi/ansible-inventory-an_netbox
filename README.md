@@ -3,9 +3,10 @@
 This Inventory plugin was developed for a friend, and it is a quite opinionated simple version of the ansible netbox inventory plugin
 to return only the needed values for a faster inventory result
 
+- Device Role filtering
 - Support removal of domain names
-- custom tag prefix
-- site filtering
+- Custom tag prefix
+- Site filtering
 
 ## Usage
 
@@ -16,6 +17,8 @@ to return only the needed values for a faster inventory result
   plugin: an_netbox
   netbox_server_url: http://10.0.0.110:8080
   netbox_api_key: 7a096c1182f928637a6441c23119ecee042439b2
+  # device_role slug to filter, if not defined it will be 'server
+  device_role: server
   # if not defined it tag_prefx will be 'tag_'
   tag_prefix: "tag_"
   # if true it will cutout the domainname and pass only ansiblehost=<device_name>
@@ -43,9 +46,9 @@ API Key to use for the autorization
 
 ### device_role
 
-Device type to filter for ( Slug Name)
+Device Role to filter for ( Slug Name)
 
-Device Types typical in a Netbox Installation
+Device Role typical in a Netbox Installation
 
 - access-switch
 - console-server
