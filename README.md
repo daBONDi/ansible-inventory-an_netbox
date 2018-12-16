@@ -9,20 +9,27 @@ to return only the needed values for a faster inventory result
 
 ## Usage
 
-- Copy an_netbox.py in your custom inventory_plugins directory
-- Create a new inventory.yml in your inventory folder
+- Copy **ansible/inventory_plugins/an_netbox.py** in your custom inventory_plugins directory
+- Create a new **an_netbox_inventory.yml** in your inventory folder like /ansible/inventory/an_netbox_inventory.yml
 
-```yaml
-plugin: an_netbox
-netbox_server_url: http://10.0.0.110:8080
-netbox_api_key: 7a096c1182f928637a6441c23119ecee042439b2
-# if not defined it tag_prefx will be 'tag_'
-tag_prefix: "tag_"
-# if true it will cutout the domainname and pass only ansiblehost=<device_name>
-cut_domain_name: true
-# filter out a specific webfaction_site
-filter_site: Interxion
-```
+  ```yaml
+  plugin: an_netbox
+  netbox_server_url: http://10.0.0.110:8080
+  netbox_api_key: 7a096c1182f928637a6441c23119ecee042439b2
+  # if not defined it tag_prefx will be 'tag_'
+  tag_prefix: "tag_"
+  # if true it will cutout the domainname and pass only ansiblehost=<device_name>
+  cut_domain_name: true
+  # filter out a specific webfaction_site
+  filter_site: Interxion
+  ```
+
+- Ensure inventoryplug is enabled in your ansible.cfg
+
+  ```ini
+  [inventory]
+  enable_plugins = an_netbox
+  ```
 
 ## Propertys
 
@@ -33,6 +40,24 @@ Url to connect to netbox api
 ### netbox_api_key - **Required**
 
 API Key to use for the autorization
+
+### device_role
+
+Device type to filter for ( Slug Name)
+
+Device Types typical in a Netbox Installation
+
+- access-switch
+- console-server
+- core-switch
+- distribution-switch
+- firewall
+- management-switch
+- pdu
+- router
+- server
+
+> **Default:** server
 
 ### tag_prefix
 
@@ -52,4 +77,4 @@ Cut out Domains from device name
 
 Will filter devices of a specific site
 
-if not defined it will return all netbox devices
+> If not defined it will return all netbox devices and virtualmachines

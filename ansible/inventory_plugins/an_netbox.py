@@ -31,6 +31,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.tag_prefix = None
         self.cut_domain_name = True
         self.filter_site = None
+        self.filter_device_role = None
 
     def _get_unique_tags(self, devices):
         """
@@ -89,6 +90,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.tag_prefix = self._set_config_property("tag_prefix", default_value="tag_")
         self.cut_domain_name = self._set_config_property("cut_domain_name", default_value=True)
         self.filter_site = self._set_config_property("filter_site", required=False)
+        self.filter_device_role = self._set_config_property("device_role", default_value="server")
 
     def _connect_to_netbox_api(self):
         try:
@@ -108,8 +110,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._set_configuration()
         self._connect_to_netbox_api()
 
-        device_data = self.netbox.dcim.devices.all()
-        vm_device_data = self.netbox.virtualization.virtual_machines.all()
+        device_data = self.netbox.dcim.devices.filter(role=self.filter_device_role)
+        vm_device_data = self.netbox.virtualization.virtual_machines.filter(role=self.filter_device_role)
         if vm_device_data:
             device_data = device_data + vm_device_data
 

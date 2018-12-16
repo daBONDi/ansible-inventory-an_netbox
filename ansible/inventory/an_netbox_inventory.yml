@@ -2,6 +2,10 @@ plugin: an_netbox
 netbox_server_url: http://10.0.0.110:8080
 netbox_api_key: 7a096c1182f928637a6441c23119ecee042439b2
 
+# device role slug name to filter query for
+# if not defined default is server
+# device_role: server
+
 # if not defined it tag_prefx will be 'tag_'
 # tag_prefix: "tag_"
 
