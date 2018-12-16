@@ -26,11 +26,11 @@ filter_site: Interxion
 
 ## Propertys
 
-### netbox_server_url
+### netbox_server_url - **Required**
 
 Url to connect to netbox api
 
-### netbox_api_key
+### netbox_api_key - **Required**
 
 API Key to use for the autorization
 

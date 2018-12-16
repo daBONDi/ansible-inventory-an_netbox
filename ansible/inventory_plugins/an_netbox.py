@@ -109,6 +109,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._connect_to_netbox_api()
 
         device_data = self.netbox.dcim.devices.all()
+        vm_device_data = self.netbox.virtualization.virtual_machines.all()
+        if vm_device_data:
+            device_data = device_data + vm_device_data
+
         if self.filter_site:
             device_data = [d for d in device_data if d.site.name == self.filter_site]
         self._populate(device_data)
