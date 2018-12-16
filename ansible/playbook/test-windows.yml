@@ -1,0 +1,5 @@
+- hosts: tags_windows
+  gather_facts: false
+  tasks:
+    - debug:
+        var: "{{ ansible_host }}"

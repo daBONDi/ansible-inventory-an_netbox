@@ -1,0 +1,9 @@
+plugin: an_netbox
+netbox_server_url: http://10.0.0.110:8080
+netbox_api_key: 7a096c1182f928637a6441c23119ecee042439b2
+# if not defined it tag_prefx will be 'tag_'
+#tag_prefix: "tag_"
+# if true it will cutout the domainname and pass only ansiblehost=<device_name>
+#cut_domain_name: false
+# filter out a specific webfaction_site
+#filter_site: Interxion
