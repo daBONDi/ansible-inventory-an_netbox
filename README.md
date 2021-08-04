@@ -1,5 +1,7 @@
 # Custom Simple Netbox Inventory Plugin
 
+> !!!! CAUTION NOT WORK WITH NEWER VERSION OF NETBOX !!!!
+
 This Inventory plugin was developed for a friend, and it is a quite opinionated simple version of the ansible netbox inventory plugin
 to return only the needed values for a faster inventory result
 
